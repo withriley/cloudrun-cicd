@@ -1,0 +1,21 @@
+name: Generate Terraform Documentation
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Render terraform docs inside the README.md and push changes back to PR branch
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: .
+        output-file: README.md
+        output-method: inject
+        config-file: .terraform-docs.yml
+        git-push: "true"
+        git-commit-message: "terraform-docs: automated action :sparkles:"
