@@ -25,14 +25,12 @@ It is entirely based on the example provided by Google [here](https://cloud.goog
 
 ```hcl
 module "cloudrun-cicd" {
-  source               = "github.com/withriley/cloudrun-cicd"
-
-  create_github_link   = false
-  github_remote_uri    = "https://github.com/petergriffin/epic_app.git"
-  github_repo_name     = "epic_app"
-  github_connection_id = "projects/production/locations/us-central1/connections/repo_conn_name"
-  project_id           = "production"
-  location             = "us-central1"
+  source                   = "github.com/withriley/cloudrun-cicd"
+  create_github_connection = false
+  github_remote_uri        = "https://github.com/petergriffin/epic_app.git"
+  github_connection_name   = "repo_conn_name"
+  project_id               = "production"
+  location                 = "us-central1"
 }
 ```
 
@@ -60,10 +58,9 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_create_github_connection"></a> [create\_github\_connection](#input\_create\_github\_connection) | Boolean to determine whether or not to create a new Github connection. If false, you must provide the github\_connection\_id variable. | `bool` | `false` | no |
-| <a name="input_github_connection_id"></a> [github\_connection\_id](#input\_github\_connection\_id) | The ID of the Github connection to use. Required only when create\_github\_link is false. Expected format: projects/<project\_id>/locations/<region>/connections/<connection\_name> | `string` | `null` | no |
+| <a name="input_github_connection_name"></a> [github\_connection\_name](#input\_github\_connection\_name) | The name of the Github connection to use (only the name is required not the full ID). Required only when create\_github\_link is false. | `string` | `null` | no |
 | <a name="input_github_org_name"></a> [github\_org\_name](#input\_github\_org\_name) | The name of your Github organization/user. Required only when create\_github\_link is true. | `string` | `null` | no |
 | <a name="input_github_remote_uri"></a> [github\_remote\_uri](#input\_github\_remote\_uri) | The HTTPS URI of the Github Repo to link to Cloud Build (ie. the repo we want to build from). Must include the protocol and .git extension. | `string` | n/a | yes |
-| <a name="input_github_repo_name"></a> [github\_repo\_name](#input\_github\_repo\_name) | The name of the Github repo you want to link to Cloud Build. | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | The location to deploy the resources to. | `string` | n/a | yes |
 | <a name="input_main_branch_name"></a> [main\_branch\_name](#input\_main\_branch\_name) | The name of the main branch of the Github repo. Defaults to 'main'. | `string` | `"main"` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The Project ID where all resources are to be created by this module. | `string` | n/a | yes |
