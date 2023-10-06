@@ -1,17 +1,20 @@
-variable "create_github_link" {
+variable "create_github_connection" {
   type    = bool
   default = false
+  description = "Boolean to determine whether or not to create a new Github connection. If false, you must provide the github_connection_id variable."
 }
 variable "github_repo_name" {
   type = string
-
+  description = "The name of the Github repo you want to link to Cloud Build."
 }
 variable "github_org_name" {
   type    = string
   default = null
+  description = "The name of your Github organization/user. Required only when create_github_link is true."
 }
 variable "location" {
   type = string
+  description = "The location to deploy the resources to."
 }
 variable "secret_id" {
   type        = string
