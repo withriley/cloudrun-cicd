@@ -77,7 +77,7 @@ resource "google_cloudbuild_trigger" "branch" {
     }
   }
 
-  filename = "/cloudbuild/branch-cloudbuild.yaml"
+  filename = "cloudbuild/branch-cloudbuild.yaml"
 }
 
 resource "google_cloudbuild_trigger" "main" {
@@ -93,7 +93,7 @@ resource "google_cloudbuild_trigger" "main" {
       branch = var.main_branch_name
     }
   }
-  filename = "/cloudbuild/main-cloudbuild.yaml"
+  filename = "cloudbuild/main-cloudbuild.yaml"
 }
 
 resource "google_cloudbuild_trigger" "tag" {
@@ -109,5 +109,5 @@ resource "google_cloudbuild_trigger" "tag" {
       tag = ".*"
     }
   }
-  filename = "/cloudbuild/tag-cloudbuild.yaml"
+  filename = "cloudbuild/tag-cloudbuild.yaml"
 }
