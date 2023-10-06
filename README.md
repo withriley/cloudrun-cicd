@@ -24,9 +24,9 @@ It is entirely based on the example provided by Google [here](https://cloud.goog
 ## Example
 
 ```hcl
-module "cd" {
+module "cloudrun-cicd" {
   source               = "github.com/withriley/cloudrun-cicd"
-  
+
   create_github_link   = false
   github_remote_uri    = "https://github.com/petergriffin/epic_app.git"
   github_repo_name     = "epic_app"
