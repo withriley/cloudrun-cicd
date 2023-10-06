@@ -3,10 +3,6 @@ variable "create_github_connection" {
   default = false
   description = "Boolean to determine whether or not to create a new Github connection. If false, you must provide the github_connection_id variable."
 }
-variable "github_repo_name" {
-  type = string
-  description = "The name of the Github repo you want to link to Cloud Build."
-}
 variable "github_org_name" {
   type    = string
   default = null
@@ -29,9 +25,9 @@ variable "github_remote_uri" {
   type        = string
   description = "The HTTPS URI of the Github Repo to link to Cloud Build (ie. the repo we want to build from). Must include the protocol and .git extension."
 }
-variable "github_connection_id" {
+variable "github_connection_name" {
   type        = string
-  description = "The ID of the Github connection to use. Required only when create_github_link is false. Expected format: projects/<project_id>/locations/<region>/connections/<connection_name>"
+  description = "The name of the Github connection to use (only the name is required not the full ID). Required only when create_github_link is false."
   default     = null
 }
 variable "main_branch_name" {
