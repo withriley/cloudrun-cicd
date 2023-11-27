@@ -1,23 +1,22 @@
-# template-terraform-module
-A Template for creating your own Terraform Modules :robot:
-
 ![TFSec Security Checks](https://github.com/withriley/template-terraform-module/actions/workflows/main.yml/badge.svg)
 ![terraform-docs](https://github.com/withriley/template-terraform-module/actions/workflows/terraform-docs.yml/badge.svg)
-![auto-release](https://github.com/withriley/template-terraform-module/actions/workflows/release.yml/badge.svg)
+
+# Cloud Run CI/CD Module
+
+This module creates the required Cloud Build jobs to implement a deployment pipeline for Cloud Run that implements a progression of code from developer branches to production with automated canary testing and percentage-based traffic management.
+
+It is entirely based on the example provided by Google [here](https://cloud.google.com/architecture/implementing-cloud-run-canary-deployments-git-branches-cloud-build).
 
 ## Usage Instructions :sparkles:
 
-1. Ensure you create your Terraform Module in the root of this directory
-2. Create new examples in `/examples/`
-3. Create new releases by creating tags with the name `v220317` - e.g. version by v-Year-Month-Day - also known as CalVer
+1. Copy the the `cloudbuild` directory to the root of your repository.
+2. Change the substitutions in each of the Cloud Build YAML files in the `cloudbuild` directory in your repository to set the region and the name of your Cloud Run service.
+3. Push the changes to your repository.
+4. Call this Terraform module and provide the required variables (and any optional variables) then apply the changes.
 
-## GitHub Actions
+## Notes
 
-This repo has 3 built in GitHub Actions:
-
-1. Security scan using tfsec - ensure no IaC errors. To delete remove the file `.github/workflows/main.yml`
-2. Terraform-Docs - documentation is automatically taken care of by Terraform-Docs which fills in info in the `README.md` of each section.
-3. Automated release - Create new releases by creating tags with the name `v220317` - e.g. version by v-Year-Month-Day - also known as CalVer.
+- The Github repository connection MUST be in the same region as the repository link (which therefore implicitly requires the triggers are in the same region as the repository)
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -25,12 +24,30 @@ This repo has 3 built in GitHub Actions:
 ## Example
 
 ```hcl
-
+module "cloudrun-cicd" {
+  source                   = "github.com/withriley/cloudrun-cicd"
+  create_github_connection = false
+  github_remote_uri        = "https://github.com/petergriffin/epic_app.git"
+  github_connection_name   = "repo_conn_name"
+  project_id               = "production"
+  location                 = "us-central1"
+}
 ```
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [google_cloudbuild_trigger.branch](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_cloudbuild_trigger.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_cloudbuild_trigger.tag](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_cloudbuildv2_connection.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuildv2_connection) | resource |
+| [google_cloudbuildv2_repository.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuildv2_repository) | resource |
+| [google_secret_manager_secret_iam_policy.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_policy) | resource |
+| [google_iam_policy.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_policy) | data source |
+| [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+| [google_secret_manager_secret.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/secret_manager_secret) | data source |
+| [google_secret_manager_secret_version.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/secret_manager_secret_version) | data source |
 
 ## Modules
 
@@ -38,27 +55,18 @@ No modules.
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_create_github_connection"></a> [create\_github\_connection](#input\_create\_github\_connection) | Boolean to determine whether or not to create a new Github connection. If false, you must provide the github\_connection\_id variable. | `bool` | `false` | no |
+| <a name="input_github_connection_name"></a> [github\_connection\_name](#input\_github\_connection\_name) | The name of the Github connection to use (only the name is required not the full ID). Required only when create\_github\_link is false. | `string` | `null` | no |
+| <a name="input_github_org_name"></a> [github\_org\_name](#input\_github\_org\_name) | The name of your Github organization/user. Required only when create\_github\_link is true. | `string` | `null` | no |
+| <a name="input_github_remote_uri"></a> [github\_remote\_uri](#input\_github\_remote\_uri) | The HTTPS URI of the Github Repo to link to Cloud Build (ie. the repo we want to build from). Must include the protocol and .git extension. | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | The location to deploy the resources to. | `string` | n/a | yes |
+| <a name="input_main_branch_name"></a> [main\_branch\_name](#input\_main\_branch\_name) | The name of the main branch of the Github repo. Defaults to 'main'. | `string` | `"main"` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The Project ID where all resources are to be created by this module. | `string` | n/a | yes |
+| <a name="input_secret_id"></a> [secret\_id](#input\_secret\_id) | The name of the secret that contains the Github token. Assumed to be within the same project. | `string` | `null` | no |
 
 ## Outputs
 
 No outputs.
 <!-- END_TF_DOCS -->
-
-## Detailed TF Module Requirements :books:
-
-1. Root module. This is the only required element for the standard module structure. Terraform files must exist in the root directory of the repository. This should be the primary entrypoint for the module and is expected to be opinionated. For the Consul module the root module sets up a complete Consul cluster. It makes a lot of assumptions however, and we expect that advanced users will use specific nested modules to more carefully control what they want.
-
-2. README. The root module and any nested modules should have README files. This file should be named README or README.md. The latter will be treated as markdown. There should be a description of the module and what it should be used for. If you want to include an example for how this module can be used in combination with other resources, put it in an examples directory like this. Consider including a visual diagram depicting the infrastructure resources the module may create and their relationship.
-
-3. LICENSE. The license under which this module is available. If you are publishing a module publicly, many organizations will not adopt a module unless a clear license is present. We recommend always having a license file, even if it is not an open source license.
-
-4. main.tf, variables.tf, outputs.tf. These are the recommended filenames for a minimal module, even if they're empty. main.tf should be the primary entrypoint. For a simple module, this may be where all the resources are created. For a complex module, resource creation may be split into multiple files but any nested module calls should be in the main file. variables.tf and outputs.tf should contain the declarations for variables and outputs, respectively.
-
-5. Variables and outputs should have descriptions. All variables and outputs should have one or two sentence descriptions that explain their purpose. This is used for documentation. See the documentation for variable configuration and output configuration for more details.
-
-6. Nested modules. Nested modules should exist under the modules/ subdirectory. Any nested module with a README.md is considered usable by an external user. If a README doesn't exist, it is considered for internal use only. These are purely advisory; Terraform will not actively deny usage of internal modules. Nested modules should be used to split complex behavior into multiple small modules that advanced users can carefully pick and choose. For example, the Consul module has a nested module for creating the Cluster that is separate from the module to setup necessary IAM policies. This allows a user to bring in their own IAM policy choices.
-
-7. Examples. Examples of using the module should exist under the examples/ subdirectory at the root of the repository. Each example may have a README to explain the goal and usage of the example. Examples for submodules should also be placed in the root examples/ directory.
-
-8. Because examples will often be copied into other repositories for customization, any module blocks should have their source set to the address an external caller would use, not to a relative path.
